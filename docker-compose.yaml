@@ -1,0 +1,33 @@
+services:
+  fastapi:
+    container_name: xapi-container
+    build:
+      context: $PWD/Docker
+      dockerfile: Dockerfile
+    image: xapi:1.0
+    working_dir: "/workspace"
+    volumes:
+      - $PWD:/workspace
+    ports:
+      - "8888:8888"
+    # gpu使わない場合はdeploy~capabilitiesをコメントアウト
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
+    environment:
+      - X_ID=${X_ID}
+      - X_PASS=${X_PASS}
+    command:  >
+      bash -c
+      'jupyter-lab 
+      --port=8888 
+      --no-browser 
+      --ip=0.0.0.0 
+      --allow-root 
+      --NotebookApp.token="" 
+      --NotebookApp.notebook_dir="/workspace"'
+      
+
